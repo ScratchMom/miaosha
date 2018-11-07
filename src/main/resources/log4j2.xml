@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status='fatal' packages="com.imooc.miaosha">
+
+	<Properties>
+		<!-- 设置为生产环境的日志存放相对目录 -->
+		<!--   相对路径  -->
+		<!--<Property name="logPath">logspro/</Property>-->
+		<Property name="logPath">logs/</Property>
+	</Properties>
+
+	<Appenders>
+		<!--  设置控制台输出格式 -->
+		<Console name="Console" target="SYSTEM_OUT" class="org.apache.log4j.ConsoleAppender">
+			<PatternLayout
+					pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%t] %-5level %M(%F:%L) - %msg%xEx%n" />
+		</Console>
+
+
+		<!-- 设置日志文件名字：fileName（日志名字），filePattern（日志切割的备份名字）   -->
+		<RollingFile name="DefaultRollingFile" fileName="${logPath}/miaosha-default.log"
+					 filePattern="${logPath}/miaosha-default-%d{MM-dd-yyyy}-%i.log">
+
+			<!--   设置``	文件输出格式和大小  -->
+			<PatternLayout
+					pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%t] %-5level %M(%F:%L) - %msg%xEx%n" />
+			<Policies>
+				<!--  按大小分割  -->
+				<!--<SizeBasedTriggeringPolicy size="20 MB" />-->
+				<!--  按日期分割：下面是一天一切割  -->
+				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
+			</Policies>
+
+		</RollingFile>
+	</Appenders>
+
+	<!--  设置日志环境   -->
+	<Loggers>
+		<Root level="info">
+			<!-- 生产环境停用Console -->
+			<appender-ref ref="Console"/>
+			<appender-ref ref="DefaultRollingFile" />
+		</Root>
+	</Loggers>
+
+</Configuration>

@@ -1,20 +1,17 @@
 package com.imooc.miaosha.cotroller;
 
-import com.imooc.miaosha.Result.CodeMsg;
 import com.imooc.miaosha.Result.Result;
 import com.imooc.miaosha.service.MiaoshaUserService;
-import com.imooc.miaosha.util.ValidatorUtil;
 import com.imooc.miaosha.vo.LoginVo;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 /**
  * @author yifan
@@ -34,7 +31,7 @@ public class LoginController {
      */
     @RequestMapping("/do_login")
     @ResponseBody
-    public Result<String> doLogin(@Valid LoginVo loginVo, HttpServletResponse response){
+    public Result<String> doLogin(@Validated LoginVo loginVo, HttpServletResponse response){
 
         logger.info("loginVo === " + loginVo.toString());
         // 登录

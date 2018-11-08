@@ -2,6 +2,7 @@ package com.imooc.miaosha.cotroller;
 
 import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.redis.GoodsKey;
+import com.imooc.miaosha.redis.KeyPrefix;
 import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.service.GoodsService;
 import com.imooc.miaosha.service.MiaoshaUserService;
@@ -57,13 +58,7 @@ public class GoodsController {
         if (!StringUtils.isEmpty(html)) {
             return html;
         }
-        // 手动渲染
-        SpringWebContext context
-                = new SpringWebContext(request,response,request.getServletContext(),request.getLocale(),model.asMap(),applicationContext);
-        html = thymeleafViewResolver.getTemplateEngine().process("goods_list",context);
-        if (!StringUtils.isEmpty(html)) {
-            redisService.set(GoodsKey.getGoodsList,"",html);
-        }
+        html = htmlHandle("goods_list",request,response,model,GoodsKey.getGoodsList,"");
         return html;
     }
 
@@ -74,11 +69,13 @@ public class GoodsController {
 //        return "goods_list";
 //    }
 
-    @RequestMapping("/to_detail/{goodsId}")
-    public String list(Model model, MiaoshaUser user,
-                       @PathVariable("goodsId") long goodsId){
+    @RequestMapping(value = "/to_detail/{goodsId}",produces = "text/html")
+    @ResponseBody
+    public String list(Model model,
+                       MiaoshaUser user,
+                       @PathVariable("goodsId") long goodsId,
+                       HttpServletRequest request,HttpServletResponse response){
 
-        logger.info("iii");
         // snowflake 算法主键自增
         model.addAttribute("user",user);
         GoodsVo goodsVo = goodsService.getGoodsDetail(goodsId);
@@ -100,7 +97,33 @@ public class GoodsController {
         model.addAttribute("miaoshaStatus",miaoshaStatus);
         model.addAttribute("remainSeconds",remainSeconds);
 
-        return "goods_detail";
+//        return "goods_detail";
+
+        // 取缓存
+        String html = redisService.get(GoodsKey.getGoodsDetail,""+goodsId,String.class);
+        if (!StringUtils.isEmpty(html)) {
+            return html;
+        }
+
+        html = htmlHandle("goods_detail",request,response,model,GoodsKey.getGoodsDetail,String.valueOf(goodsId));
+        return html;
+    }
+
+    /**
+     * 手动渲染模板
+     * @param thymeleafTemp
+     * @return
+     */
+    public String htmlHandle (String thymeleafTemp, HttpServletRequest request, HttpServletResponse response, Model model, KeyPrefix keyPrefix,String key) {
+        String html = "";
+                // 手动渲染
+        SpringWebContext context
+                = new SpringWebContext(request,response,request.getServletContext(),request.getLocale(),model.asMap(),applicationContext);
+        html = thymeleafViewResolver.getTemplateEngine().process(thymeleafTemp,context);
+        if (!StringUtils.isEmpty(html)) {
+            redisService.set(keyPrefix,""+key,html);
+        }
+        return html;
     }
 }
 

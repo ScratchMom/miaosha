@@ -46,47 +46,54 @@ public class GoodsController {
     ApplicationContext applicationContext;
 
 
-    @RequestMapping(value = "/to_list",produces = "text/html")
+    /**
+     * 返回商品列表页面
+     *
+     * Spring MVC 在内部使用了一个org.springframework.ui.Model 接口存储模型数据。
+     * Spring MVC 在调用方法前会创建一个–隐含的模型对象作为模型数据的存储容器。
+     * 如果方法的入参为 Map 或 Model 类型，Spring MVC 会隐含模型的引用传递给这些入参。
+     * 在方法体内，开发者可以通过这个入参对象访问到模型中的所有数据，也可以向模型中添加新的属性数据。
+     * @param model
+     * @param user
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/to_list", produces = "text/html")
     @ResponseBody
-    public String list(Model model, MiaoshaUser user, HttpServletRequest request,HttpServletResponse response){
+    public String list(Model model, MiaoshaUser user, HttpServletRequest request, HttpServletResponse response) {
         List<GoodsVo> goodsVos = goodsService.listGoodsVo();
-        model.addAttribute("goodsList",goodsVos);
-//        return "goods_list";
+        model.addAttribute("goodsList", goodsVos);
 
         // 取缓存
-        String html = redisService.get(GoodsKey.getGoodsList,"",String.class);
+        String html = redisService.get(GoodsKey.getGoodsList, "", String.class);
         if (!StringUtils.isEmpty(html)) {
             return html;
         }
-        html = htmlHandle("goods_list",request,response,model,GoodsKey.getGoodsList,"");
+        html = htmlHandle("goods_list", request, response, model, GoodsKey.getGoodsList, "");
         return html;
     }
 
-//    @RequestMapping("/to_list")
-//    public String list(Model model, MiaoshaUser user){
-//        List<GoodsVo> goodsVos = goodsService.listGoodsVo();
-//        model.addAttribute("goodsList",goodsVos);
-//        return "goods_list";
-//    }
 
-    @RequestMapping(value = "/to_detail/{goodsId}",produces = "text/html")
+
+    @RequestMapping(value = "/to_detail/{goodsId}", produces = "text/html")
     @ResponseBody
     public String list(Model model,
                        MiaoshaUser user,
                        @PathVariable("goodsId") long goodsId,
-                       HttpServletRequest request,HttpServletResponse response){
+                       HttpServletRequest request, HttpServletResponse response) {
 
         // snowflake 算法主键自增
-        model.addAttribute("user",user);
+        model.addAttribute("user", user);
         GoodsVo goodsVo = goodsService.getGoodsDetail(goodsId);
-        model.addAttribute("goods",goodsVo);
+        model.addAttribute("goods", goodsVo);
         long startAt = goodsVo.getStartDate().getTime();
         long endAt = goodsVo.getEndDate().getTime();
         long nowAt = System.currentTimeMillis();
         int miaoshaStatus = 0;
         int remainSeconds = 0;
         if (nowAt < startAt) {  // 秒杀没开始
-            remainSeconds = (int)(nowAt - nowAt)/1000;
+            remainSeconds = (int) (nowAt - nowAt) / 1000;
         } else if (nowAt > endAt) { // 秒杀已结束
             miaoshaStatus = 2;
             remainSeconds = -1;
@@ -94,34 +101,40 @@ public class GoodsController {
             miaoshaStatus = 1;
             remainSeconds = 0;
         }
-        model.addAttribute("miaoshaStatus",miaoshaStatus);
-        model.addAttribute("remainSeconds",remainSeconds);
+        model.addAttribute("miaoshaStatus", miaoshaStatus);
+        model.addAttribute("remainSeconds", remainSeconds);
 
 //        return "goods_detail";
 
         // 取缓存
-        String html = redisService.get(GoodsKey.getGoodsDetail,""+goodsId,String.class);
+        String html = redisService.get(GoodsKey.getGoodsDetail, "" + goodsId, String.class);
         if (!StringUtils.isEmpty(html)) {
             return html;
         }
 
-        html = htmlHandle("goods_detail",request,response,model,GoodsKey.getGoodsDetail,String.valueOf(goodsId));
+        html = htmlHandle("goods_detail", request, response, model, GoodsKey.getGoodsDetail, String.valueOf(goodsId));
         return html;
     }
 
     /**
      * 手动渲染模板
+     *
      * @param thymeleafTemp
      * @return
      */
-    public String htmlHandle (String thymeleafTemp, HttpServletRequest request, HttpServletResponse response, Model model, KeyPrefix keyPrefix,String key) {
+    public String htmlHandle(String thymeleafTemp,
+                             HttpServletRequest request,
+                             HttpServletResponse response,
+                             Model model,
+                             KeyPrefix keyPrefix,
+                             String key) {
         String html = "";
-                // 手动渲染
+        // 手动渲染
         SpringWebContext context
-                = new SpringWebContext(request,response,request.getServletContext(),request.getLocale(),model.asMap(),applicationContext);
-        html = thymeleafViewResolver.getTemplateEngine().process(thymeleafTemp,context);
+                = new SpringWebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap(), applicationContext);
+        html = thymeleafViewResolver.getTemplateEngine().process(thymeleafTemp, context);
         if (!StringUtils.isEmpty(html)) {
-            redisService.set(keyPrefix,""+key,html);
+            redisService.set(keyPrefix, "" + key, html);
         }
         return html;
     }

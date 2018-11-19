@@ -1,6 +1,7 @@
 package com.imooc.miaosha.redis;
 
 import com.alibaba.fastjson.JSON;
+import com.imooc.miaosha.domain.MiaoshaUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
@@ -68,6 +69,25 @@ public class RedisService { // 用RedisService提供redis服务
         }
     }
 
+    /**
+     * 删除
+     * @param prefix
+     * @param key
+     * @return
+     */
+    public boolean delete(KeyPrefix prefix, String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            // 生成真正的key
+            String realKey = prefix.getPrefix() + key;
+            Long ret = jedis.del(realKey);
+            return ret > 0;
+        } finally  {
+            returnToPool(jedis);
+        }
+
+    }
 
     /**
      * 判断一个key是否存在

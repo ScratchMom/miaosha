@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
             logger.error("e:",ex);
             return Result.error(CodeMsg.BIND_ERROR.fillArgs(msg));
         } else {
-            logger.error(CodeMsg.SERVER_ERROR.getMsg() + ":" + e);
+            logger.error(CodeMsg.SERVER_ERROR.getMsg() + ":",e);
             return Result.error(CodeMsg.SERVER_ERROR);
         }
     }

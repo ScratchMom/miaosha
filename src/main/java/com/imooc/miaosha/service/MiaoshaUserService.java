@@ -115,8 +115,8 @@ public class MiaoshaUserService {
             // 延长有效期
             addCookie(user,token, response);
         }
-        logger.info("token === " + token);
-        logger.info("user === " + JSON.toJSONString(user));
+//        logger.info("token === " + token);
+//        logger.info("user === " + JSON.toJSONString(user));
         return user;
     }
 

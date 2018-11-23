@@ -77,14 +77,14 @@ public class UserUtil {
         for(int i=0;i<users.size();i++) {
             MiaoshaUser user = users.get(i);
             URL url = new URL(urlString);
-            HttpURLConnection co = (HttpURLConnection)url.openConnection();
-            co.setRequestMethod("POST");
-            co.setDoOutput(true);
-            OutputStream out = co.getOutputStream();
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            OutputStream out = connection.getOutputStream();
             String params = "mobile="+user.getId()+"&password="+MD5Util.inputPassToFormPass("123456");
             out.write(params.getBytes());
             out.flush();
-            InputStream inputStream = co.getInputStream();
+            InputStream inputStream = connection.getInputStream();
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             byte buff[] = new byte[1024];
             int len = 0;

@@ -26,13 +26,13 @@ public class GoodsService {
         return goodsVos;
     }
 
-    public GoodsVo getGoodsDetail (long goodsId) {
-        return goodsDao.getGoodsDetail(goodsId);
-    }
-
     public void reduceStock(GoodsVo goodsVo) {
         MiaoshaGoods g = new MiaoshaGoods();
         g.setGoodsId(goodsVo.getId());
         goodsDao.reduceStock(g);
+    }
+
+    public GoodsVo getGoodsVoByGoodsId(long goodsId) {
+        return goodsDao.getGoodsDetail(goodsId);
     }
 }

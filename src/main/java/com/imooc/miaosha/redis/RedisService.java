@@ -2,6 +2,8 @@ package com.imooc.miaosha.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.imooc.miaosha.domain.MiaoshaUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
@@ -13,6 +15,8 @@ import redis.clients.jedis.JedisPool;
  */
 @Service
 public class RedisService { // 用RedisService提供redis服务
+
+    Logger logger = LoggerFactory.getLogger(RedisService.class);
 
     @Autowired
     JedisPool jedisPool;
@@ -33,6 +37,9 @@ public class RedisService { // 用RedisService提供redis服务
             // 真正的key
             String realKey = keyPrefix.getPrefix() + key;
             String str = jedis.get(realKey);
+//            logger.info("realkey :{}",realKey);
+//            logger.info("要被转换的字符串str :{}",str);
+//            logger.info("clazz :{}" + clazz.getName());
             T t = stringToBean(str,clazz);
             return t;
         } finally {

@@ -1,5 +1,6 @@
 package com.imooc.miaosha.cotroller;
 
+import com.imooc.miaosha.Result.CodeMsg;
 import com.imooc.miaosha.Result.Result;
 import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.redis.GoodsKey;
@@ -78,14 +79,24 @@ public class GoodsController {
         return html;
     }
 
-    @RequestMapping(value = "/to_detail/{goodsId}", produces = "text/html")
+
+    /**
+     * 页面静态化技术
+     * @param model
+     * @param user
+     * @param goodsId
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/detail/{goodsId}")
     @ResponseBody
     public Result<GoodsDetailVo> detail(Model model,
                                         MiaoshaUser user,
                                         @PathVariable("goodsId") long goodsId,
                                         HttpServletRequest request, HttpServletResponse response) {
 
-        GoodsVo goodsVo = goodsService.getGoodsDetail(goodsId);
+        GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
         // snowflake 算法主键自增
         model.addAttribute("goods", goodsVo);
         long startAt = goodsVo.getStartDate().getTime();
@@ -114,7 +125,15 @@ public class GoodsController {
     }
 
 
-
+    /**
+     * 页面缓存技术
+     * @param model
+     * @param user
+     * @param goodsId
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping(value = "/to_detail2/{goodsId}", produces = "text/html")
     @ResponseBody
     public String detail2(Model model,
@@ -124,7 +143,7 @@ public class GoodsController {
 
         // snowflake 算法主键自增
         model.addAttribute("user", user);
-        GoodsVo goodsVo = goodsService.getGoodsDetail(goodsId);
+        GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
         model.addAttribute("goods", goodsVo);
         long startAt = goodsVo.getStartDate().getTime();
         long endAt = goodsVo.getEndDate().getTime();

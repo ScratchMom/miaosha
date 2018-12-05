@@ -115,7 +115,7 @@ function getMiaoshaPath(){
 function getMiaoshaResult(goodsId){
 	g_showLoading();
 	$.ajax({
-		url:"/miaosha/result",
+		url:"/api/miaosha/result",
 		type:"GET",
 		data:{
 			goodsId:$("#goodsId").val(),
@@ -157,8 +157,8 @@ function doMiaosha(){
 		},
 		success:function(data){
 			if(data.code == 0){
-				window.location.href="/order_detail.htm?orderId="+data.data.id;
-				// getMiaoshaResult($("#goodsId").val());
+				// window.location.href="/order_detail.htm?orderId="+data.data.id;
+				getMiaoshaResult($("#goodsId").val());
 			}else{
 				layer.msg(data.msg);
 			}

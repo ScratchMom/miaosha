@@ -104,7 +104,7 @@ public class RedisService { // 用RedisService提供redis服务
      * @param <T>
      * @return
      */
-    public <T> boolean exists(KeyPrefix keyPrefix, String key,T value) {
+    public <T> boolean exists(KeyPrefix keyPrefix, String key) {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();    // jedisPool是一个连接池，用完一定要释放掉
@@ -154,7 +154,7 @@ public class RedisService { // 用RedisService提供redis服务
 
 
 
-    public <T> String beanToString (T value) {
+    public static <T> String beanToString (T value) {
         if (value == null) {
             return null;
         }
@@ -171,7 +171,7 @@ public class RedisService { // 用RedisService提供redis服务
     }
 
     @SuppressWarnings("unchecked")
-    public <T>T stringToBean (String str, Class<T> clazz) {
+    public static  <T>T stringToBean (String str, Class<T> clazz) {
         if (str == null || str.length() <=0 || clazz == null) {
             return null;
         }

@@ -4,6 +4,8 @@ import com.imooc.miaosha.domain.MiaoshaOrder;
 import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.domain.OrderInfo;
 import com.imooc.miaosha.domain.User;
+import com.imooc.miaosha.redis.MiaoKey;
+import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,15 +25,51 @@ public class MiaoshaService {
     @Autowired
     OrderService orderService;
 
+    @Autowired
+    RedisService redisService;
+
     @Transactional
     public OrderInfo miaosha(MiaoshaUser user, GoodsVo goodsVo) {
 
         // 减库存
-        goodsService.reduceStock(goodsVo);
-
-        // 下订单，写入秒杀订单
-        OrderInfo orderInfo = orderService.createOrder(user,goodsVo);
-        return orderInfo;
+        boolean success = goodsService.reduceStock(goodsVo);
+        if (success) {
+            // 下订单，写入秒杀订单
+            OrderInfo orderInfo = orderService.createOrder(user,goodsVo);
+            return orderInfo;
+        } else {
+            setGoodsOver(goodsVo.getId());
+        }
+        return null;
     }
 
+    private void setGoodsOver(Long id) {
+        redisService.set(MiaoKey.isGoodsOver,"" + id ,true);
+    }
+
+    private boolean getGoodsOver(Long id) {
+        return redisService.exists(MiaoKey.isGoodsOver,"" + id);
+    }
+
+
+    /**
+     *
+     * @param userId
+     * @param goodsId
+     * @return orderId 成功,0 排队中,-1 失败
+     */
+    public long getMiaoshaResult(Long userId, long goodsId) {
+
+        MiaoshaOrder miaoshaOrder = orderService.getMiaoshaOrderByUserIdGoodsId(userId,goodsId);
+        if (miaoshaOrder !=null) {
+            return miaoshaOrder.getOrderId();
+        } else {
+            boolean isOver = getGoodsOver(goodsId);
+            if (isOver) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+    }
 }

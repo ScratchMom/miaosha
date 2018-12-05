@@ -2,6 +2,7 @@ package com.imooc.miaosha.cotroller;
 
 import com.imooc.miaosha.Result.Result;
 import com.imooc.miaosha.domain.User;
+import com.imooc.miaosha.rabbitmq.MQSender;
 import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.redis.UserKey;
 import com.imooc.miaosha.service.UserService;
@@ -24,13 +25,29 @@ public class SampleController {
     @Autowired
     RedisService redisService;
 
-    @RequestMapping("/redis/get")
+    @Autowired
+    MQSender sender;
+
+    @RequestMapping("/mq/topic")
     @ResponseBody
-    Result<User> redisGet() {
-        User str = redisService.get(UserKey.getById,"1",User.class);
-        return  Result.success(str);
+    Result<String> topic_exchange() {
+        sender.sendTopic("topic exchange test");
+        return Result.success("Hi Lao wang!");
     }
 
+    @RequestMapping("/mq/fanout")
+    @ResponseBody
+    Result<String> fanout() {
+        sender.sendFanout("fanout exchange test");
+        return Result.success("Hi Lao wang!");
+    }
+
+    @RequestMapping("/mq/headers")
+    @ResponseBody
+    Result<String> headers() {
+        sender.sendHeaders("headers exchange test");
+        return Result.success("Hi Lao wang!");
+    }
     @RequestMapping("/redis/set")
     @ResponseBody
     Result redisSet() {

@@ -7,7 +7,7 @@
   <groupId>com.imooc</groupId>
   <artifactId>miaosha_idea</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <name>miaosha_idea</name>
   <!-- FIXME change it to the project's website -->
@@ -26,11 +26,11 @@
   </parent>
   <dependencies>
       <!--spring-boot项目生成war包-->
-      <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
-        <!--<scope>provided</scope>-->
-      <!--</dependency>-->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-tomcat</artifactId>
+        <scope>provided</scope>
+      </dependency>
 
       <!-- 这是一个web项目-->
       <dependency>
@@ -144,19 +144,26 @@
       <version>1.16.20</version>
       <scope>provided</scope>
     </dependency>
+
+    <!-- amqp -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-amqp</artifactId>
+      <version>2.0.5.RELEASE</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>${project.artifactId}</finalName>
     <plugins>
 
       <!--spring-boot项目生成war包-->
-      <!--<plugin>-->
-        <!--<groupId>org.apache.maven.plugins</groupId>-->
-        <!--<artifactId>maven-war-plugin</artifactId>-->
-        <!--<configuration>-->
-          <!--<failOnMissingWebXml>false</failOnMissingWebXml>-->
-        <!--</configuration>-->
-      <!--</plugin>-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

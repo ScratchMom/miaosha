@@ -26,10 +26,10 @@ public class GoodsService {
         return goodsVos;
     }
 
-    public void reduceStock(GoodsVo goodsVo) {
+    public boolean reduceStock(GoodsVo goodsVo) {
         MiaoshaGoods g = new MiaoshaGoods();
         g.setGoodsId(goodsVo.getId());
-        goodsDao.reduceStock(g);
+        return goodsDao.reduceStock(g);
     }
 
     public GoodsVo getGoodsVoByGoodsId(long goodsId) {

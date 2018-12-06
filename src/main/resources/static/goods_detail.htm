@@ -95,8 +95,8 @@ function getMiaoshaPath(){
 		url:"api/miaosha/path",
 		type:"GET",
 		data:{
-			goodsId:goodsId
-			// verifyCode:$("#verifyCode").val()
+			goodsId:goodsId,
+			verifyCode:$("#verifyCode").val()
 		},
 		success:function(data){
 			if(data.code == 0){
@@ -229,9 +229,9 @@ function countDown(){
 			clearTimeout(timeout);
 		}
 		$("#miaoshaTip").html("秒杀进行中");
-		// $("#verifyCodeImg").attr("src", "/miaosha/verifyCode?goodsId="+$("#goodsId").val());
-		// $("#verifyCodeImg").show();
-		// $("#verifyCode").show();
+		$("#verifyCodeImg").attr("src", "/api/miaosha/verifyCode?goodsId="+$("#goodsId").val());
+		$("#verifyCodeImg").show();
+		$("#verifyCode").show();
 	}else{//秒杀已经结束
 		$("#buyButton").attr("disabled", true);
 		$("#miaoshaTip").html("秒杀已经结束");
@@ -240,7 +240,7 @@ function countDown(){
 	}
 }
 function refreshVerifyCode(){
-	$("#verifyCodeImg").attr("src", "/miaosha/verifyCode?goodsId="+$("#goodsId").val()+"&timestamp="+new Date().getTime());
+	$("#verifyCodeImg").attr("src", "/api/miaosha/verifyCode?goodsId="+$("#goodsId").val()+"&timestamp="+new Date().getTime());
 }
 </script>
 </html>

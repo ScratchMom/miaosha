@@ -17,6 +17,7 @@ public class MiaoKey extends BasePrefix {
 
     public static MiaoKey isGoodsOver = new MiaoKey("go");
     public static MiaoKey getMiaoshPath = new MiaoKey(60,"go");
+    public static MiaoKey getMiaoshaVerifyCode = new MiaoKey(60,"go");
 
 
 }

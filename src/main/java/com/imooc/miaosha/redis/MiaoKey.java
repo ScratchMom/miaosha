@@ -6,12 +6,17 @@ package com.imooc.miaosha.redis;
  */
 public class MiaoKey extends BasePrefix {
 
-    private static final int TOKEN_EXPIRE = 3600*24*2;
 
     public MiaoKey(String prefix) {
         super(prefix);
     }
 
+    public MiaoKey(int expireSeconds, String prefix) {
+        super(expireSeconds, prefix);
+    }
+
     public static MiaoKey isGoodsOver = new MiaoKey("go");
+    public static MiaoKey getMiaoshPath = new MiaoKey(60,"go");
+
 
 }

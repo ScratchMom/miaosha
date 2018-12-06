@@ -9,10 +9,13 @@ import com.imooc.miaosha.domain.OrderInfo;
 import com.imooc.miaosha.rabbitmq.MQSender;
 import com.imooc.miaosha.rabbitmq.MiaoshaMessage;
 import com.imooc.miaosha.redis.GoodsKey;
+import com.imooc.miaosha.redis.MiaoKey;
 import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.service.GoodsService;
 import com.imooc.miaosha.service.MiaoshaService;
 import com.imooc.miaosha.service.OrderService;
+import com.imooc.miaosha.util.MD5Util;
+import com.imooc.miaosha.util.UUIDUtil;
 import com.imooc.miaosha.vo.GoodsDetailVo;
 import com.imooc.miaosha.vo.GoodsVo;
 import org.slf4j.Logger;
@@ -21,10 +24,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,11 +56,12 @@ public class MiaoshaController implements InitializingBean {
     @Autowired
     MQSender sender;
 
-    private Map<Long,Boolean> localOverMap = new HashMap<Long, Boolean>();
+    private Map<Long, Boolean> localOverMap = new HashMap<Long, Boolean>();
 
 
     /**
      * 系统初始化
+     *
      * @throws Exception
      */
     @Override
@@ -71,36 +72,39 @@ public class MiaoshaController implements InitializingBean {
             return;
         }
         for (GoodsVo goodsVo : goodsVos) {
-            redisService.set(GoodsKey.getMiaoshaGoodsStock,"" + goodsVo.getId(),goodsVo.getStockCount());
-            localOverMap.put(goodsVo.getId(),false);
+            redisService.set(GoodsKey.getMiaoshaGoodsStock, "" + goodsVo.getId(), goodsVo.getStockCount());
+            localOverMap.put(goodsVo.getId(), false);
         }
     }
 
     /**
+     * qps 1755
+     * <p>
      * 秒杀
+     *
      * @param model
      * @param user
-     * @param request
-     * @param response
-     * @return
-     */
-
-    /**
-     * qps 1755
-     *
-     * GET POST区别
-     * GET幂等 代表从服务端获取数据，无论触发多少次不会对服务端数据产生影响  <<<---反例--->>> <a href=""></a>   事故错误
+     * @return GET POST区别
+     * ET幂等 代表从服务端获取数据，无论触发多少次不会对服务端数据产生影响  <<<---反例--->>> <a href=""></a>   事故错误
      * post 对服务的提交数据，对服务端数据的变化产生影响
      */
-    @RequestMapping(value = "/do_miaosha",method = RequestMethod.POST)
+    @RequestMapping(value = "{path}/do_miaosha", method = RequestMethod.POST)
     @ResponseBody
     public Result<Integer> miaosha(Model model,
-                                         MiaoshaUser user,
-                                         @RequestParam("goodsId") long goodsId) {
-        model.addAttribute("user",user);
+                                   MiaoshaUser user,
+                                   @RequestParam("goodsId") long goodsId,
+                                   @PathVariable("path") String path) {
+        model.addAttribute("user", user);
         if (user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);
         }
+
+        // 验证动态path
+        boolean check = miaoshaService.checkPath(user,goodsId,path);
+        if (!check) {
+            return Result.error(CodeMsg.REQUEST_ILLEGAL);
+        }
+
         // 内存标记，减少redis访问
         boolean over = localOverMap.get(goodsId);
         if (over) {
@@ -109,15 +113,15 @@ public class MiaoshaController implements InitializingBean {
 
 
         // 预减库存
-        long stock = redisService.decr(GoodsKey.getMiaoshaGoodsStock,"" + goodsId);
+        long stock = redisService.decr(GoodsKey.getMiaoshaGoodsStock, "" + goodsId);
 
         if (stock < 0) {
-            localOverMap.put(goodsId,true);
+            localOverMap.put(goodsId, true);
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
 
         // 判断是否已经秒杀到了 防止一个人秒杀多个商品
-        MiaoshaOrder miaoshaOrder = orderService.getMiaoshaOrderByUserIdGoodsId(user.getId(),goodsId);
+        MiaoshaOrder miaoshaOrder = orderService.getMiaoshaOrderByUserIdGoodsId(user.getId(), goodsId);
         if (miaoshaOrder != null) {
             return Result.error(CodeMsg.REPEATE_MIAOSHA);
         }
@@ -149,28 +153,42 @@ public class MiaoshaController implements InitializingBean {
 
     /**
      * 轮询
+     *
      * @param model
      * @param user
      * @param goodsId
      * @return
      */
-    @RequestMapping(value = "/result",method = RequestMethod.GET)
+    @RequestMapping(value = "/result", method = RequestMethod.GET)
     @ResponseBody
     public Result<Long> miaoshaResult(Model model,
-                          MiaoshaUser user,
-                          @RequestParam("goodsId") long goodsId) {
+                                      MiaoshaUser user,
+                                      @RequestParam("goodsId") long goodsId) {
         if (user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);
         }
 
-        /**
-         * orderId 成功
-         * 0 排队中
-         * -1 失败
-         */
+        /*orderId 成功 0 排队中 -1 失败*/
         Long result = miaoshaService.getMiaoshaResult(user.getId(), goodsId);
         return Result.success(result);
     }
 
 
+    /**
+     * 隐藏秒杀地址
+     *
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping(value = "/path", method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getMiaoshaPath(MiaoshaUser user,
+                                         @RequestParam("goodsId") long goodsId) {
+        if (user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        String path = miaoshaService.createMiaoshaPath(user,goodsId);
+        return Result.success(path);
+    }
 }

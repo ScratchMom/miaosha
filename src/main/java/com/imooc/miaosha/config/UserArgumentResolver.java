@@ -1,5 +1,6 @@
 package com.imooc.miaosha.config;
 
+import com.imooc.miaosha.access.UserContext;
 import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.service.MiaoshaUserService;
 import org.apache.commons.lang3.StringUtils;
@@ -40,30 +41,32 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) throws Exception {
-        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-        HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
 
-        String paramTooken = request.getParameter(MiaoshaUserService.COOKIE_NAME_TOKEN);
-        String cookieTooken = getCookieValue(request,MiaoshaUserService.COOKIE_NAME_TOKEN);
-
-        if (StringUtils.isEmpty(cookieTooken) && StringUtils.isEmpty(paramTooken)) {
-            logger.info("token 传入失败");
-            return null;
-        }
-        String token = StringUtils.isEmpty(paramTooken) ? cookieTooken : paramTooken;
-        return miaoshaUserService.getByToken(token,response);
+        return UserContext.getUser();
+//        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+//        HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+//
+//        String paramTooken = request.getParameter(MiaoshaUserService.COOKIE_NAME_TOKEN);
+//        String cookieTooken = getCookieValue(request,MiaoshaUserService.COOKIE_NAME_TOKEN);
+//
+//        if (StringUtils.isEmpty(cookieTooken) && StringUtils.isEmpty(paramTooken)) {
+//            logger.info("token 传入失败");
+//            return null;
+//        }
+//        String token = StringUtils.isEmpty(paramTooken) ? cookieTooken : paramTooken;
+//        return miaoshaUserService.getByToken(token,response);
     }
-    private String getCookieValue (HttpServletRequest request, String cookieName) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null || cookies.length <= 0) {
-            return null;
-        }
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(cookieName)) {
-                logger.info("cookie value === " + cookie.getValue());
-                return cookie.getValue();
-            }
-        }
-        return null;
-    }
+//    private String getCookieValue (HttpServletRequest request, String cookieName) {
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies == null || cookies.length <= 0) {
+//            return null;
+//        }
+//        for (Cookie cookie : cookies) {
+//            if (cookie.getName().equals(cookieName)) {
+//                logger.info("cookie value === " + cookie.getValue());
+//                return cookie.getValue();
+//            }
+//        }
+//        return null;
+//    }
 }

@@ -1,10 +1,12 @@
 package com.imooc.miaosha.config;
 
+import com.imooc.miaosha.access.AccessInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.List;
@@ -21,6 +23,9 @@ public class WebConfig extends WebMvcConfigurerAdapter {    // 自定参数解�
     @Autowired
     UserArgumentResolver userArgumentResolver;
 
+    @Autowired
+    AccessInterceptor accessInterceptor;
+
     /**
      * 添加解析器来支持自定义控制器方法参数类型。
      * @param argumentResolvers
@@ -29,5 +34,10 @@ public class WebConfig extends WebMvcConfigurerAdapter {    // 自定参数解�
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         logger.info(" 自定参数解析器");
         argumentResolvers.add(userArgumentResolver);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(accessInterceptor);
     }
 }

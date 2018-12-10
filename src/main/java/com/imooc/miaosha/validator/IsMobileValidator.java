@@ -1,6 +1,5 @@
 package com.imooc.miaosha.validator;
 
-import com.imooc.miaosha.config.UserArgumentResolver;
 import com.imooc.miaosha.util.ValidatorUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

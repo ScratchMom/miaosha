@@ -90,13 +90,19 @@
 
 function getMiaoshaPath(){
 	var goodsId = $("#goodsId").val();
+	var verifyCode = $("#verifyCode").val();
+	if (verifyCode == '') {
+        layer.msg("请输入验证码");
+        return;
+    }
+
 	g_showLoading();
 	$.ajax({
 		url:"api/miaosha/path",
 		type:"GET",
 		data:{
 			goodsId:goodsId,
-			verifyCode:$("#verifyCode").val()
+			verifyCode:verifyCode
 		},
 		success:function(data){
 			if(data.code == 0){

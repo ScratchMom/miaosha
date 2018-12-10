@@ -3,11 +3,13 @@ package com.imooc.miaosha.cotroller;
 import com.alibaba.fastjson.JSON;
 import com.imooc.miaosha.Result.CodeMsg;
 import com.imooc.miaosha.Result.Result;
+import com.imooc.miaosha.access.AccessLimit;
 import com.imooc.miaosha.domain.MiaoshaOrder;
 import com.imooc.miaosha.domain.MiaoshaUser;
 import com.imooc.miaosha.domain.OrderInfo;
 import com.imooc.miaosha.rabbitmq.MQSender;
 import com.imooc.miaosha.rabbitmq.MiaoshaMessage;
+import com.imooc.miaosha.redis.AccessKey;
 import com.imooc.miaosha.redis.GoodsKey;
 import com.imooc.miaosha.redis.MiaoKey;
 import com.imooc.miaosha.redis.RedisService;
@@ -27,6 +29,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -186,17 +189,23 @@ public class MiaoshaController implements InitializingBean {
      * @param goodsId
      * @return
      */
+    @AccessLimit(seconds=5, maxCount=5)
     @RequestMapping(value = "/path", method = RequestMethod.GET)
     @ResponseBody
     public Result<String> getMiaoshaPath(MiaoshaUser user,
+                                         HttpServletRequest request,
                                          @RequestParam("goodsId") long goodsId,
                                          @RequestParam("verifyCode") Integer verifyCode) {
         if (user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);
         }
+//        查询访问次数
+        String uri = request.getRequestURI();
+        String key = uri + "_" + user.getId();
+        redisService.get(AccessKey.access,key,Integer.class);
         boolean check = miaoshaService.checkVerifyCode(user,goodsId,verifyCode);
         if (!check) {
-            return Result.error(CodeMsg.SESSION_ERROR);
+            return Result.error(CodeMsg.VERIFYCODE_ERROR);
         }
         String path = miaoshaService.createMiaoshaPath(user,goodsId);
         return Result.success(path);

@@ -61,11 +61,11 @@ public class MQReceiver {
 
     }
 
-    @RabbitListener(queues = MQConfig.QUEUE)
-    public void receive(String message) {
-        logger.info("receive message :{}",message);
-    }
 
+//    @RabbitListener(queues = MQConfig.QUEUE)
+//    public void receive(String message) {
+//        logger.info("receive message :{}",message);
+//    }
     @RabbitListener(queues = MQConfig.TOPIC_QUEUE1)
     public void receiveQueue1(String message) {
         logger.info("receive topic.queue1 message :{}",message);

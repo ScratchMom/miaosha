@@ -36,12 +36,12 @@ public class MQSender {
      *
      * @param message
      */
-    public void send(Object message) {
-
-        String msg = RedisService.beanToString(message);
-        logger.info("send message : {}", msg);
-        rabbitTemplate.convertAndSend(MQConfig.QUEUE, msg);
-    }
+//    public void send(Object message) {
+//
+//        String msg = RedisService.beanToString(message);
+//        logger.info("send message : {}", msg);
+//        rabbitTemplate.convertAndSend(MQConfig.QUEUE, msg);
+//    }
 
     /**
      * topic 模式 交换机Exchange

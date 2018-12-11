@@ -5,7 +5,7 @@
 		<!-- 设置为生产环境的日志存放相对目录 -->
 		<!--   相对路径  -->
 		<!--<Property name="logPath">logspro/</Property>-->
-		<Property name="logPath">logs/</Property>
+		<Property name="logPath">../logs</Property>
 	</Properties>
 
 	<Appenders>

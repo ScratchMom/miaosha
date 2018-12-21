@@ -68,7 +68,7 @@ public class MiaoshaController implements InitializingBean {
 
 
     /**
-     * 系统初始化
+     * 系统初始化 在调用 MiaoshaController类 无参构造器实例化后，容器初始化成功前，执行这个方法<br>
      *
      * @throws Exception
      */
@@ -108,7 +108,7 @@ public class MiaoshaController implements InitializingBean {
         }
 
         // 验证动态path
-        boolean check = miaoshaService.checkPath(user,goodsId,path);
+        boolean check = miaoshaService.checkPath(user, goodsId, path);
         if (!check) {
             return Result.error(CodeMsg.REQUEST_ILLEGAL);
         }
@@ -189,7 +189,7 @@ public class MiaoshaController implements InitializingBean {
      * @param goodsId
      * @return
      */
-    @AccessLimit(seconds=5, maxCount=5)
+    @AccessLimit(seconds = 5, maxCount = 5)
     @RequestMapping(value = "/path", method = RequestMethod.GET)
     @ResponseBody
     public Result<String> getMiaoshaPath(MiaoshaUser user,
@@ -202,17 +202,18 @@ public class MiaoshaController implements InitializingBean {
 //        查询访问次数
         String uri = request.getRequestURI();
         String key = uri + "_" + user.getId();
-        redisService.get(AccessKey.access,key,Integer.class);
-        boolean check = miaoshaService.checkVerifyCode(user,goodsId,verifyCode);
+        redisService.get(AccessKey.access, key, Integer.class);
+        boolean check = miaoshaService.checkVerifyCode(user, goodsId, verifyCode);
         if (!check) {
             return Result.error(CodeMsg.VERIFYCODE_ERROR);
         }
-        String path = miaoshaService.createMiaoshaPath(user,goodsId);
+        String path = miaoshaService.createMiaoshaPath(user, goodsId);
         return Result.success(path);
     }
 
     /**
      * 获取验证码
+     *
      * @param user
      * @param goodsId
      * @return
@@ -225,12 +226,12 @@ public class MiaoshaController implements InitializingBean {
         if (user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);
         }
-        BufferedImage image = miaoshaService.createMiaoshaVerifyCode(user,goodsId);
+        BufferedImage image = miaoshaService.createMiaoshaVerifyCode(user, goodsId);
 
         OutputStream outputStream = null;
         try {
             outputStream = response.getOutputStream();
-            ImageIO.write(image,"jpeg",outputStream);
+            ImageIO.write(image, "jpeg", outputStream);
             outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();

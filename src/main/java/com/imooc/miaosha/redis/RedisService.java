@@ -100,7 +100,6 @@ public class RedisService { // 用RedisService提供redis服务
      * 判断一个key是否存在
      * @param keyPrefix
      * @param key
-     * @param value
      * @param <T>
      * @return
      */

@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author yifan
  * @date 2018/7/21 下午10:11
+ *
+ * 参数拦截器 -- supportsParameter(){}拦截某一个参数，resolveArgument(){}具体处理含有这个参数的逻辑
  */
 @Service
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {

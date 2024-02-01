@@ -1,0 +1,74 @@
+logging:
+  config: classpath:log4j2.xml
+mybatis:
+  configuration:
+    default-fetch-size: 100
+    default-statement-timeout: 3000
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:com/imooc/miaosha/dao/*.xml
+  type-aliases-package: com.imooc.miaosha.domain
+redis:
+  host: 127.0.0.1
+  password: 123456
+  poolMaxIdle: 500
+  poolMaxTotal: 1000
+  poolMaxWait: 500
+  port: 6379
+  timeout: 10
+server:
+  port: 8013
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    initialSize: 100
+    maxActive: 1000
+    maxOpenPreparedStatements: 20
+    maxWait: 60000
+    minEvictableIdleTimeMillis: 300000
+    minldle: 500
+    password: root
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://127.0.0.1:3306/miaosha?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&rewriteBatchedStatements=TRUE&allowMultiQueries=true&useSSL=false
+    username: root
+    validationQuery: select 'x'
+  profiles:
+    active: dev
+  rabbitmq:
+    addresses: 127.0.0.1:5672
+    listener:
+      simple:
+        auto-startup: true
+        concurrency: 10
+        default-requeue-rejected: true
+        max-concurrency: 10
+        prefetch: 1
+    password: guest
+    template:
+      retry:
+        enabled: true
+        initial-interval: 1000
+        max-attempts: 3
+        max-interval: 10000
+        multiplier: 1.0
+    username: guest
+    virtual-host: /
+  resources:
+    add-mappings: true
+    cache-period: 3600
+    chain:
+      cache: true
+      enabled: true
+      gzipped: true
+      html-application-cache: true
+    static-locations: classpath:/static/
+  thymeleaf:
+    cache: false
+    content-type: text/html
+    enabled: true
+    encoding: UTF-8
+    mode: HTML5
+    prefix: classpath:/templates/
+    suffix: .html

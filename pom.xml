@@ -33,6 +33,14 @@
         <!--<scope>provided</scope>-->
         <!--</dependency>-->
 
+        <!--热部署-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+
         <!-- 这是一个web项目-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

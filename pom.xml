@@ -100,7 +100,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.44</version>
+            <version>8.0.28</version>
         </dependency>
 
         <!--添加Fastjson依赖  序列化 把java对象转化成一个json字符串写到redis服务器里-->

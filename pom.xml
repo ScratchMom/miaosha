@@ -131,7 +131,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.6</version>
+            <version>3.18.0</version>
         </dependency>
 
         <!--自定义参数校验器 + 全局异常处理器-->
